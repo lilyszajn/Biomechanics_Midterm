@@ -30,9 +30,9 @@ PVector leftFootLocation2D;
 PVector rightShoulderLocation2D;
 PVector leftShoulderLocation2D;
 
-PVector shoulderAvg; 
-PVector feetAvg;
-PVector kneeAvg;
+//PVector shoulderAvg; 
+//PVector feetAvg;
+//PVector kneeAvg;
 
 
 int r = 255;
@@ -50,9 +50,9 @@ boolean autoCalib=true;
 
 void setup() { 
 
-    //load the background image
-  background(255);
-  
+  //load the background image
+  //background(255);
+  scale(2);
   kinect = new SimpleOpenNI(this); //create kinect object
   kinect.enableDepth(); //enable the depth image
   kinect.enableRGB(); //display color video feed of user rather than depth image
@@ -60,7 +60,7 @@ void setup() {
   kinect.alternativeViewPointDepthToImage(); //turn on depth color alignment
 
 
-  size(640, 480); 
+  size(1280, 960); 
 
   //initialize joint location objects as vectors
   prevRightHandLocation = new PVector(0, 0, 0);
@@ -79,12 +79,13 @@ void setup() {
 void draw() { 
   //set up the kinect part
   //scale(2);
+  PImage rgbImage = kinect.rgbImage();
+  //image(rgbImage, 0, 0,1280,960);
   //load the background image
   background(255);
   kinect.update(); 
-  PImage rgbImage = kinect.rgbImage();
   //image(depthImage, 0, 0);
-  //image(rgbImage, 0, 0);
+  
   //image(kinect.depthImage(), 0, 0);
 
   IntVector userList = new IntVector(); 
@@ -96,24 +97,27 @@ void draw() {
     if (kinect.isTrackingSkeleton(userId)) { 
       //display the user's image
       //prepare the color pixels
+      
       rgbImage.loadPixels();
-      loadPixels();
       userMap = kinect.getUsersPixels(SimpleOpenNI.USERS_ALL);
       for (int i = 0; i < userMap.length; i++) {
         //if the pixel is part of the user
-        if (userMap[i] !=0) {
+        if (userMap[i] == 0) {
           //set the sketch pixel to the color pixel
-          pixels[i] = rgbImage.pixels[i];
+          rgbImage.pixels[i] = color(255,255); 
         }
+        
       }//end of pixel for loop
-      updatePixels();
+      
+      rgbImage.updatePixels();
+      image(rgbImage,0,0,width, height);
 
-      /*//millis() start after calibration has happened
-      if (startTime == 0) {
-        startTime = millis();
-        //startTime = millis();
-        println("START TIME" + startTime);
-      }*/
+      /* millis() start after calibration has happened
+       if (startTime == 0) {
+       startTime = millis();
+       //startTime = millis();
+       println("START TIME" + startTime);
+       }*/
 
       drawSkeleton(userId);
 
@@ -166,43 +170,46 @@ void draw() {
       leftFootLocation2D = new PVector(leftFootLocation.x, leftFootLocation.y);
       //rightShoulderLocation2D = new PVector(rightShoulderLocation.x, rightShoulderLocation.y);
       //leftShoulderLocation2D = new PVector(leftShoulderLocation.x, leftShoulderLocation.y);
-      
-       shoulderAvg = new PVector();
-       feetAvg = new PVector();
-       kneeAvg = new PVector();
-      
+
+
       //average out the overall shoulder location 
-      shoulderAvg =  rightShoulderLocation.add(leftShoulderLocation);
+      PVector shoulderAvg = new PVector(rightShoulderLocation.x, rightShoulderLocation.y, rightShoulderLocation.z);
+
+      shoulderAvg.add(leftShoulderLocation);
       shoulderAvg.div(2);
-      
-      feetAvg = rightFootLocation.add(leftFootLocation);
+
+      PVector feetAvg = new PVector(rightFootLocation.x, rightFootLocation.y, rightFootLocation.z);
+
+      feetAvg.add(leftFootLocation);
       feetAvg.div(2);
-      
-      kneeAvg = rightKneeLocation.add(leftKneeLocation);
+
+      PVector kneeAvg = new PVector(rightKneeLocation.x, rightKneeLocation.y, rightKneeLocation.z);
+      kneeAvg.add(leftKneeLocation);
       kneeAvg.div(2);
-
-      float kneeToFoot = (kneeAvg.x - feetAvg.x); //averages the knee to foot distance
-      abs(kneeToFoot);
-      float shoulderToFoot = (shoulderAvg.z - feetAvg.z); //distance of shoulders to feet if position should be 0 in ideal scenario
-      abs(shoulderToFoot);
-
       
+      smooth();
+      float kneeToFoot = (kneeAvg.x - feetAvg.x); //averages the knee to foot distance
+      //abs(kneeToFoot);
+      float shoulderToFoot = (shoulderAvg.z - feetAvg.z); //distance of shoulders to feet if position should be 0 in ideal scenario
+      //abs(shoulderToFoot);
+
+
       // show the angles on the screen for debugging
       fill(255, 0, 0);
-      scale(3);
-      text("average distance of feet from knees: " + int(kneeToFoot) + "\n" +
-        " shoulder position over feet: " + int(shoulderToFoot), 20, 20);
-        
-       
-       
+      scale(2);
+      text("average distance of feet from knees: " + abs(kneeToFoot) + "\n" +
+        " shoulder position over feet: " + abs(shoulderToFoot), 20, 20);
+
+
+
 
       /*//figure out the distance between the current location and previous location of the knees
-      float currentScore = (rightKneeLocation2D.dist(prevRightKneeLocation) + leftKneeLocation2D.dist(prevLeftKneeLocation));
-
-      fill(255, 50, 70);
-      text("Knee Distance: " + currentScore, 10, 10);*/
+       float currentScore = (rightKneeLocation2D.dist(prevRightKneeLocation) + leftKneeLocation2D.dist(prevLeftKneeLocation));
+       
+       fill(255, 50, 70);
+       text("Knee Distance: " + currentScore, 10, 10);*/
     }
-    
+
     prevRightKneeLocation = rightKneeLocation2D;
     prevLeftKneeLocation = leftKneeLocation2D;
     prevRightHipLocation = rightHipLocation2D;
@@ -242,7 +249,7 @@ void drawSkeleton(int userId) {
    
    noStroke();*/
 
-  fill(r, g, b); 
+  fill(r, 0, 0); 
   drawJoint(userId, SimpleOpenNI.SKEL_HEAD); 
   drawJoint(userId, SimpleOpenNI.SKEL_NECK); 
   drawJoint(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER); 
