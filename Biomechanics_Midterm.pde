@@ -1,13 +1,8 @@
-import fsm.*;
 import processing.net.*;
 import SimpleOpenNI.*;  //middleware to execute skeleton tracking
 SimpleOpenNI kinect;
 import java.lang.Runtime;
 import processing.video.*; //to run the intro video
-
-Movie intro;
-Movie outro;
-Movie currentMovie;
 
 int[] userMap;
 PImage backgroundImage; //background image
@@ -22,6 +17,19 @@ PVector prevRightFootLocation;
 PVector prevLeftFootLocation;
 PVector prevRightShoulderLocation;
 PVector prevLeftShoulderLocation;
+
+
+PVector rightHandLocation2D;
+PVector leftHandLocation2D;
+PVector rightKneeLocation2D;
+PVector leftKneeLocation2D;
+PVector rightHipLocation2D;
+PVector leftHipLocation2D;
+PVector rightFootLocation2D;
+PVector leftFootLocation2D;
+PVector rightShoulderLocation2D;
+PVector leftShoulderLocation2D;
+
 
 int r = 255;
 int g = 255;
@@ -38,14 +46,15 @@ boolean autoCalib=true;
 
 void setup() { 
 
+    //load the background image
+  background(255);
+  
   kinect = new SimpleOpenNI(this); //create kinect object
   kinect.enableDepth(); //enable the depth image
   kinect.enableRGB(); //display color video feed of user rather than depth image
   kinect.enableUser(SimpleOpenNI.SKEL_PROFILE_ALL);
   kinect.alternativeViewPointDepthToImage(); //turn on depth color alignment
 
-  //load the background image
-  background(255);
 
   size(640, 480); 
 
@@ -66,6 +75,8 @@ void setup() {
 void draw() { 
   //set up the kinect part
   //scale(2);
+  //load the background image
+  background(255);
   kinect.update(); 
   PImage rgbImage = kinect.rgbImage();
   //image(depthImage, 0, 0);
@@ -93,12 +104,12 @@ void draw() {
       }//end of pixel for loop
       updatePixels();
 
-      //millis() start after calibration has happened
+      /*//millis() start after calibration has happened
       if (startTime == 0) {
         startTime = millis();
         //startTime = millis();
         println("START TIME" + startTime);
-      }
+      }*/
 
       drawSkeleton(userId);
 
@@ -139,18 +150,18 @@ void draw() {
       kinect.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_LEFT_SHOULDER, rightShoulderLocation); 
       PVector leftShoulderLocation = new PVector();
       // put the position of the right hip into that vector
-      kinect.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER leftShoulderLocation); 
+      kinect.getJointPositionSkeleton(userId, SimpleOpenNI.SKEL_RIGHT_SHOULDER, leftShoulderLocation); 
 
       //Look at shoulder to foot angle in lumbar lordosis - acute angle or obtuse angle : should be no angle if walking correctly
       // reduce our joint vectors to two dimensions
-      PVector rightHipLocation2D = new PVector(rightHipLocation.x, rightHipLocation.y); 
-      PVector rightKneeLocation2D = new PVector(rightKneeLocation.x, rightKneeLocation.y);
-      PVector leftKneeLocation2D = new PVector(leftKneeLocation.x, leftKneeLocation.y);
-      PVector leftHipLocation2D = new PVector(leftHipLocation.x, leftHipLocation.y);
-      PVector rightFootLocation2D = new PVector(rightFootLocation.x, rightFootLocation.y);
-      PVector leftFootLocation2D = new PVector(leftFootLocation.x, leftFootLocation.y);
-      PVector rightShoulderLocation2D = new PVector(rightShoulderLocation.x, rightShoulderLocation.y);
-      PVector leftShoulderLocation2D = new PVector(leftShoulderLocation.x, leftShoulderLocation.y);
+      rightHipLocation2D = new PVector(rightHipLocation.x, rightHipLocation.y); 
+      rightKneeLocation2D = new PVector(rightKneeLocation.x, rightKneeLocation.y);
+      leftKneeLocation2D = new PVector(leftKneeLocation.x, leftKneeLocation.y);
+      leftHipLocation2D = new PVector(leftHipLocation.x, leftHipLocation.y);
+      rightFootLocation2D = new PVector(rightFootLocation.x, rightFootLocation.y);
+      leftFootLocation2D = new PVector(leftFootLocation.x, leftFootLocation.y);
+      rightShoulderLocation2D = new PVector(rightShoulderLocation.x, rightShoulderLocation.y);
+      leftShoulderLocation2D = new PVector(leftShoulderLocation.x, leftShoulderLocation.y);
 
       // calculate the axes against which we want to measure our angles
       PVector rightShoulderFootOrientation =
@@ -162,95 +173,37 @@ void draw() {
       float rightShoulderFootAngle = angleOf(rightShoulderLocation2D, 
       rightFootLocation2D, 
       rightShoulderFootOrientation);
-      float rightShoulderFootAngle = angleOf(leftShoulderLocation2D, 
+      float leftShoulderFootAngle = angleOf(leftShoulderLocation2D, 
       leftFootLocation2D, 
       leftShoulderFootOrientation);
       // show the angles on the screen for debugging
       fill(255, 0, 0);
       scale(3);
       text("right side: " + int(rightShoulderFootAngle) + "\n" +
-        " left side: " + int(rightShoulderFootAngle), 20, 20);
+        " left side: " + int(leftShoulderFootAngle), 20, 20);
+
+      /*//figure out the distance between the current location and previous location of the knees
+      float currentScore = (rightKneeLocation2D.dist(prevRightKneeLocation) + leftKneeLocation2D.dist(prevLeftKneeLocation));
+
+      fill(255, 50, 70);
+      text("Knee Distance: " + currentScore, 10, 10);*/
     }
+    
+    prevRightKneeLocation = rightKneeLocation2D;
+    prevLeftKneeLocation = leftKneeLocation2D;
+    prevRightHipLocation = rightHipLocation2D;
+    prevLeftHipLocation = leftHipLocation2D;
+    prevRightFootLocation = rightFootLocation2D;
+    prevLeftFootLocation = leftFootLocation2D;
+    prevRightShoulderLocation = rightShoulderLocation2D;
+    prevLeftShoulderLocation = leftShoulderLocation2D;
   }
 }
+
 float angleOf(PVector one, PVector two, PVector axis) {
   PVector limb = PVector.sub(two, one);
   return degrees(PVector.angleBetween(limb, axis));
 }
-
-//figure out the distance between the current location and previous location of the knees
-float currentScore = (rightKneeLocation.dist(prevRightKneeLocation) + leftKneeLocation.dist(prevLeftKneeLocation));
-
-
-//float time = millis();
-
-/*//add the distance moved to itself 
- if ((millis() - startTime) < 10000) {
- finalScore += currentScore;
- }*/
-
-fill(255, 50, 70);
-text("Knee Distance: " + currentScore, 10, 10);
-//  println("TOTAL SCORE:" + finalScore);
-//set the current location as the previous location (i.e. reset)
-prevRightHandLocation = rightHandLocation;
-prevLeftHandLocation = leftHandLocation;
-prevRightKneeLocation = rightKneeLocation;
-prevLeftKneeLocation = leftKneeLocation;
-prevRightHipLocation = rightHipLocation;
-prevLeftHipLocation = leftHipLocation;
-prevRightFootLocation = rightFootLocation;
-prevLeftFootLocation = leftFootLocation;
-prevRightShoulderLocation = rightShoulderLocation;
-prevLeftShoulderLocation = leftShoulderLocation;
-
-
-//timeLeft = testTime - (millis() - startTime);
-
-
-//println("tl: " + timeLeft + " st: " + startTime + " m: " + millis());
-
-
-/*if ((millis() - startTime) < testTime) {
- fill(200, 30, 255);
- //scale(2);
- text("Time left:" + timeLeft, 0, 20);
- //text("elapsed:" + (millis() - startTime), 10, 30);
- fill(200, 30, 255);
- text("Current Score: " + finalScore, 90, 20);
- }
- else {
- fill(5, 200, 100);
- //scale(2);
- 
- text("Great job!", 15, 50);
- text("Your final score is:" + finalScore, 15, 65);
- }*/
-
-/*        else if (finalScore >= 36000 && finalScore <=80000) {
- fill(5, 200, 100);
- //scale(2);
- 
- text("Great job!", 15, 50);
- text("Your final score is:" + "1", 15, 65);
- }
- 
- else if (finalScore >= 36000 && finalScore <=80000) {
- fill(5, 200, 100);
- //scale(2);
- 
- text("Great job!", 15, 50);
- text("Your final score is:" + "1", 15, 65);
- } */
-
-//saveFrame("kinect####.png");
-} // end TrackingSkeleton
-} // end userDataAvaialable
-}
-}
-
-
-
 
 
 void drawSkeleton(int userId) { 
