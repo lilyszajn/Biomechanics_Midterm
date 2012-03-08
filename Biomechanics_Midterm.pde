@@ -164,14 +164,14 @@ void draw() {
       //leftShoulderLocation2D = new PVector(leftShoulderLocation.x, leftShoulderLocation.y);
       
       //average out the overall shoulder location 
-      float avgRightShoulderLocation = ((rightShoulderLocation + prevRightShoulderLocation)/2);
+      float avgRightShoulderLocation = ((rightShoulderLocation.z + prevRightShoulderLocation.z)/2);
       //average out the overall shoulder location 
-      float avgLeftShoulderLocation = ((leftShoulderLocation + prevLeftShoulderLocation)/2);
+      float avgLeftShoulderLocation = ((leftShoulderLocation.z + prevLeftShoulderLocation.z)/2);
       
       //average out the overall foot location
-      float avgRightFootLocation = ((rightFootLocation + prevRightFootLocation)/2);
+      float avgRightFootLocation = ((rightFootLocation.z + prevRightFootLocation.z)/2);
       //average out the overall foot location
-      float avgLeftFootLocation = ((leftFootLocation + prevLeftFootLocation)/2);
+      float avgLeftFootLocation = ((leftFootLocation.z + prevLeftFootLocation.z)/2);
 
       float kneeToFoot = ((rightKneeLocation2D.dist(rightFootLocation2D) + leftKneeLocation2D.dist(leftFootLocation2D))/2); //averages the knee to foot distance
       float shoulderToFoot = ((avgRightShoulderLocation.dist(avgRightFootLocation) + (avgLeftShoulderLocation.dist(avgLeftFootLocation))/2); //averages the shoulder
