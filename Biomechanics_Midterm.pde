@@ -181,6 +181,13 @@ void draw() {
       scale(3);
       text("right side: " + int(rightShoulderFootAngle) + "\n" +
         " left side: " + int(leftShoulderFootAngle), 20, 20);
+        
+       println("Axis" + rightShoulderFootOrientation);
+       println("Axis" + leftShoulderFootOrientation);
+       println("shoulder location" + rightShoulderLocation2D);
+       println("foot location" + rightFootLocation2D);
+       
+       
 
       /*//figure out the distance between the current location and previous location of the knees
       float currentScore = (rightKneeLocation2D.dist(prevRightKneeLocation) + leftKneeLocation2D.dist(prevLeftKneeLocation));
