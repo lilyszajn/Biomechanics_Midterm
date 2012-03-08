@@ -30,6 +30,10 @@ PVector leftFootLocation2D;
 PVector rightShoulderLocation2D;
 PVector leftShoulderLocation2D;
 
+PVector shoulderAvg; 
+PVector feetAvg;
+PVector kneeAvg;
+
 
 int r = 255;
 int g = 255;
@@ -163,25 +167,31 @@ void draw() {
       //rightShoulderLocation2D = new PVector(rightShoulderLocation.x, rightShoulderLocation.y);
       //leftShoulderLocation2D = new PVector(leftShoulderLocation.x, leftShoulderLocation.y);
       
-      //average out the overall shoulder location 
-      float avgRightShoulderLocation = ((rightShoulderLocation.z + prevRightShoulderLocation.z)/2);
-      //average out the overall shoulder location 
-      float avgLeftShoulderLocation = ((leftShoulderLocation.z + prevLeftShoulderLocation.z)/2);
+       shoulderAvg = new PVector();
+       feetAvg = new PVector();
+       kneeAvg = new PVector();
       
-      //average out the overall foot location
-      float avgRightFootLocation = ((rightFootLocation.z + prevRightFootLocation.z)/2);
-      //average out the overall foot location
-      float avgLeftFootLocation = ((leftFootLocation.z + prevLeftFootLocation.z)/2);
+      //average out the overall shoulder location 
+      shoulderAvg =  rightShoulderLocation.add(leftShoulderLocation);
+      shoulderAvg.div(2);
+      
+      feetAvg = rightFootLocation.add(leftFootLocation);
+      feetAvg.div(2);
+      
+      kneeAvg = rightKneeLocation.add(leftKneeLocation);
+      kneeAvg.div(2);
 
-      float kneeToFoot = ((rightKneeLocation2D.dist(rightFootLocation2D) + leftKneeLocation2D.dist(leftFootLocation2D))/2); //averages the knee to foot distance
-      float shoulderToFoot = ((avgRightShoulderLocation.dist(avgRightFootLocation) + (avgLeftShoulderLocation.dist(avgLeftFootLocation))/2); //averages the shoulder
+      float kneeToFoot = (kneeAvg.x - feetAvg.x); //averages the knee to foot distance
+      abs(kneeToFoot);
+      float shoulderToFoot = (shoulderAvg.z - feetAvg.z); //distance of shoulders to feet if position should be 0 in ideal scenario
+      abs(shoulderToFoot);
 
       
       // show the angles on the screen for debugging
       fill(255, 0, 0);
       scale(3);
-      text("average knee to foot: " + int(kneeToFoot) + "\n" +
-        " left side: " + int(shoulderToFoot), 20, 20);
+      text("average distance of feet from knees: " + int(kneeToFoot) + "\n" +
+        " shoulder position over feet: " + int(shoulderToFoot), 20, 20);
         
        
        
