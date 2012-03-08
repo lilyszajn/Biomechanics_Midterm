@@ -160,32 +160,29 @@ void draw() {
       leftHipLocation2D = new PVector(leftHipLocation.x, leftHipLocation.y);
       rightFootLocation2D = new PVector(rightFootLocation.x, rightFootLocation.y);
       leftFootLocation2D = new PVector(leftFootLocation.x, leftFootLocation.y);
-      rightShoulderLocation2D = new PVector(rightShoulderLocation.x, rightShoulderLocation.y);
-      leftShoulderLocation2D = new PVector(leftShoulderLocation.x, leftShoulderLocation.y);
+      //rightShoulderLocation2D = new PVector(rightShoulderLocation.x, rightShoulderLocation.y);
+      //leftShoulderLocation2D = new PVector(leftShoulderLocation.x, leftShoulderLocation.y);
+      
+      //average out the overall shoulder location 
+      float avgRightShoulderLocation = ((rightShoulderLocation + prevRightShoulderLocation)/2);
+      //average out the overall shoulder location 
+      float avgLeftShoulderLocation = ((leftShoulderLocation + prevLeftShoulderLocation)/2);
+      
+      //average out the overall foot location
+      float avgRightFootLocation = ((rightFootLocation + prevRightFootLocation)/2);
+      //average out the overall foot location
+      float avgLeftFootLocation = ((leftFootLocation + prevLeftFootLocation)/2);
 
-      // calculate the axes against which we want to measure our angles
-      PVector rightShoulderFootOrientation =
-        PVector.sub(rightShoulderLocation2D, rightFootLocation2D); 
-      PVector leftShoulderFootOrientation =
-        PVector.sub(leftShoulderLocation2D, leftFootLocation2D); 
+      float kneeToFoot = ((rightKneeLocation2D.dist(rightFootLocation2D) + leftKneeLocation2D.dist(leftFootLocation2D))/2); //averages the knee to foot distance
+      float shoulderToFoot = ((avgRightShoulderLocation.dist(avgRightFootLocation) + (avgLeftShoulderLocation.dist(avgLeftFootLocation))/2); //averages the shoulder
 
-      // calculate the angles between our joints
-      float rightShoulderFootAngle = angleOf(rightShoulderLocation2D, 
-      rightFootLocation2D, 
-      rightShoulderFootOrientation);
-      float leftShoulderFootAngle = angleOf(leftShoulderLocation2D, 
-      leftFootLocation2D, 
-      leftShoulderFootOrientation);
+      
       // show the angles on the screen for debugging
       fill(255, 0, 0);
       scale(3);
-      text("right side: " + int(rightShoulderFootAngle) + "\n" +
-        " left side: " + int(leftShoulderFootAngle), 20, 20);
+      text("average knee to foot: " + int(kneeToFoot) + "\n" +
+        " left side: " + int(shoulderToFoot), 20, 20);
         
-       println("Axis" + rightShoulderFootOrientation);
-       println("Axis" + leftShoulderFootOrientation);
-       println("shoulder location" + rightShoulderLocation2D);
-       println("foot location" + rightFootLocation2D);
        
        
 
